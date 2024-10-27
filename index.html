@@ -1,0 +1,133 @@
+<h1>hello gurbani</h1>
+<input type="text" id="search"/> <button onclick="searchGurbani()">Search</button>
+<script src="/node_modules/socket.io/client-dist/socket.io.min.js"></script>
+<script>
+  const socket = io('http://localhost:3000');
+
+// Listen for connection event
+socket.on('connect', () => {
+  console.log('Connected to the server');
+
+  // Emit a custom event to the server
+  socket.emit('customEvent', { someData: 'hello' });
+});
+
+// Listen for a custom event from the server
+socket.on('responseEvent', (data) => {
+  console.log('Message from server:', data);
+});
+
+// Handle disconnection
+socket.on('disconnect', () => {
+  console.log('Disconnected from the server');
+});
+</script>
+<script>
+    var allFilesArray = [];
+    //Object.groupBy(allFilesArray, ({groupName}) => groupName)["/Sri Guru Granth Sahib Ji"].flatMap(x => x.data.flatMap(x1 => x1.lines)).filter(x => x.gurmukhi.SGPC.indexOf("suin") > -1)
+    function searchGurbani(){
+        document.getElementById("search").value
+    }
+    function init() {
+        // allFilesArray = [
+        //     {
+        //         groupName: "root",
+        //         startIndex: -1,
+        //         endIndex: -1,
+        //         data: [],
+        //         getFileName: () => {
+        //             return "banis"
+        //         }
+        //     },
+        //     {
+        //         groupName: "root",
+        //         startIndex: -1,
+        //         endIndex: -1,
+        //         data: [],
+        //         getFileName: () => {
+        //             return "compositions"
+        //         }
+        //     },
+        //     {
+        //         groupName: "root",
+        //         startIndex: -1,
+        //         endIndex: -1,
+        //         data: [],
+        //         getFileName: () => {
+        //             return "languages"
+        //         }
+        //     },
+        //     {
+        //         groupName: "Sri Guru Granth Sahib Ji",
+        //         startIndex: 1,
+        //         endIndex: 1429,
+        //         data: [],
+        //         getFileName: (index) => {
+        //             return String(index).padStart(4, '0');
+        //         }
+        //     }
+        // ];
+        // allFilesArray.forEach(bani => {
+        //     var fileNames = [];
+        //     if(bani.groupName === "root"){
+        //         fileNames = [bani.getFileName()];
+        //     }else{
+        //         for (let index = bani.startIndex; index <= bani.endIndex; index++) {
+        //             fileNames.push(bani.groupName + "/" +bani.getFileName(index))
+        //         }
+        //     }
+        //     fileNames.forEach(fileName => {
+        //         fetch('./GurbaniDB/data/'+fileName+'.json').then(res => res.json()).then((res) => {
+        //             bani.data.push({
+        //                 fileName: fileName,
+        //                 fileData: res
+        //             })
+        //         }).catch((res) => {
+        //             bani.data.push({
+        //                 fileName: fileName,
+        //                 fileData: []
+        //             })
+        //         })
+        //     });
+        // })
+        fetch('./gurbanifull.json').then(res => res.json()).then((res) => {
+            allFilesArray = res;
+            //saveObjects();
+            // allFilesArray.forEach(bani => {
+            //     const fileName = [bani.groupName.replace("/",""), bani.fileName].join("/");
+            //     fetch('./GurbaniDB/data/'+fileName).then(res => res.json()).then((res) => {
+            //         bani.data = res;
+            //     }).catch((res) => {
+            //         bani.data = [];
+            //         bani.reason = res;
+            //     })
+            // });
+        })
+    };
+    init();
+
+    function saveObjects(){
+        var numberOfRecords = 100;
+        var startNumber = 0;
+        
+        var schedulerInt = setInterval(function (){
+var endNumber = (startNumber + numberOfRecords);
+if(allFilesArray.length < endNumber){
+    endNumber = allFilesArray.length;
+    clearInterval(schedulerInt)
+}
+            for (let index = startNumber; index < endNumber; index++) {
+                const bani = allFilesArray[index];
+                    const fileName = [bani.groupName.replace("/",""), bani.fileName].join("/");
+                fetch('./GurbaniDB/data/'+fileName).then(res => res.json()).then((res) => {
+                    bani.data = res;
+                }).catch((res) => {
+                    bani.data = [];
+                    bani.reason = res;
+                })
+                
+            }
+            startNumber = endNumber;
+        }, 1000)
+    }
+</script>
