@@ -1,0 +1,19 @@
+{
+  "name": "gurbanidb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "http-server",
+    "prepareData": "node build.js",
+    "socketio": "node socketio.js",
+    "sttm": "node sttmdownload.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "http-server": "^14.1.1",
+    "socket.io": "^4.8.1"
+  }
+}
